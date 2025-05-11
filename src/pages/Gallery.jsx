@@ -3,6 +3,7 @@ import { Search, Filter, Image as ImageIcon } from 'lucide-react';
 import Card from '../components/ui/Card';
 import InputField from '../components/ui/InputField';
 import Button from '../components/ui/Button';
+import DecryptedText from '../components/animations/DecryptedText';
 
 const Gallery = () => {
   const [images, setImages] = useState([]);
@@ -52,10 +53,27 @@ const Gallery = () => {
     <div className="max-w-6xl mx-auto">
       <section className="text-center mb-8 animate-fade-in">
         <h1 className="text-4xl font-bold text-primary-800 mb-4">
-          Your Gallery
+          <DecryptedText 
+            text="Your Gallery"
+            speed={40}
+            sequential={true}
+            revealDirection="center"
+            animateOn="view"
+            parentClassName="decrypted-text-parent"
+            className="text-primary-800"
+            encryptedClassName="text-primary-500"
+          />
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Browse, filter, and manage your AI-generated masterpieces.
+          <DecryptedText 
+            text="Browse, filter, and manage your AI-generated masterpieces."
+            speed={30}
+            sequential={true}
+            animateOn="view"
+            parentClassName="decrypted-text-parent"
+            className="text-gray-600"
+            encryptedClassName="text-gray-400"
+          />
         </p>
       </section>
 
@@ -136,7 +154,17 @@ const Gallery = () => {
               <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <ImageIcon className="h-8 w-8 text-gray-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No images found</h3>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                <DecryptedText 
+                  text="No images found"
+                  speed={50}
+                  sequential={true}
+                  animateOn="view"
+                  parentClassName="decrypted-text-parent"
+                  className="text-gray-700"
+                  encryptedClassName="text-gray-500"
+                />
+              </h3>
               {searchTerm ? (
                 <p className="text-gray-600">
                   No images match your search term. Try a different search.
