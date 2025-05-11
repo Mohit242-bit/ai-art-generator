@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ImageGenerator from '../components/features/ImageGenerator';
 import GridDistortion from '../components/animations/GridDistortion';
-import DecryptedText from '../components/animations/DecryptedText';
 
 const Home = () => {
   const [showDistortion, setShowDistortion] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  // Simple hover state for basic effects 
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     // After 4 seconds, start fading out
@@ -29,17 +30,20 @@ const Home = () => {
     <div className="relative">
       {/* Grid Distortion Background - only shown for 5 seconds */}
       {showDistortion && (
-        <div className={`fixed inset-0 z-0 transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
-         <GridDistortion
-  imageSrc="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
-  grid={15}
-  mouse={0.15}
-  strength={0.2}
-  relaxation={0.85}
-  // New hover-specific options
-  hoverStrength={1.5}  
-  animationSpeed={1.0}
-/>
+        <div 
+          className={`fixed inset-0 z-0 transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <div className={`transition-transform duration-200 ${isHovering ? 'scale-105' : ''}`}>
+            <GridDistortion
+              imageSrc="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
+              grid={15}
+              mouse={0.15}
+              strength={0.2}
+              relaxation={0.85}
+            />
+          </div>
           <div className="absolute inset-0 bg-black bg-opacity-70"></div>
         </div>
       )}
@@ -58,31 +62,10 @@ const Home = () => {
         {/* Hero Section */}
         <section className="min-h-[85vh] flex flex-col justify-center items-center text-center mb-16">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white text-shadow">
-            <DecryptedText 
-              text="AI Art Generator"
-              speed={30}
-              maxIterations={15}
-              sequential={true}
-              revealDirection="center"
-              animateOn="view"
-              parentClassName="decrypted-text-parent"
-              className="cyberpunk-decrypted"
-              encryptedClassName="cyberpunk-encrypted"
-              characters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}|:<>?[]\\;',./~`"
-            />
+            AI Art Generator
           </h1>
-          
           <p className="text-xl md:text-2xl max-w-2xl mb-10 text-white text-shadow">
-            <DecryptedText 
-              text="Transform your ideas into stunning AI-generated artwork with just a few words"
-              speed={20}
-              sequential={true}
-              revealDirection="start"
-              animateOn="view"
-              parentClassName="decrypted-text-parent"
-              className="title-decrypted"
-              encryptedClassName="title-encrypted"
-            />
+            Transform your ideas into stunning AI-generated artwork with just a few words
           </p>
           
           <a href="#generator" className="bg-white text-primary-800 hover:bg-primary-100 px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-300 shadow-lg">
@@ -92,17 +75,7 @@ const Home = () => {
 
         {/* Image Generator Section with white background card for contrast */}
         <section id="generator" className="mb-16 bg-white bg-opacity-95 p-8 rounded-xl shadow-lg">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-            <DecryptedText 
-              text="Create Your Masterpiece"
-              speed={40}
-              sequential={true}
-              animateOn="view"
-              parentClassName="decrypted-text-parent"
-              className="text-gray-800"
-              encryptedClassName="text-primary-600"
-            />
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Create Your Masterpiece</h2>
           <ImageGenerator />
         </section>
 
@@ -112,15 +85,7 @@ const Home = () => {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <DecryptedText 
-              text="How It Works"
-              speed={50}
-              sequential={true}
-              animateOn="hover"
-              parentClassName="decrypted-text-parent"
-              className="text-gray-800"
-              encryptedClassName="text-primary-600"
-            />
+            How It Works
           </h2>
           
           <div className="grid md:grid-cols-3 gap-6">

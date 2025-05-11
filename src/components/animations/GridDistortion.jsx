@@ -1,4 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
+// Copy this content to your src/components/animations/GridDistortion.jsx file
+import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import './GridDistortion.css';
 
@@ -17,25 +18,12 @@ const fragmentShader = `
 uniform sampler2D uDataTexture;
 uniform sampler2D uTexture;
 uniform vec4 resolution;
-uniform float time;
-uniform float hoverIntensity;
 varying vec2 vUv;
 
 void main() {
   vec2 uv = vUv;
   vec4 offset = texture2D(uDataTexture, vUv);
-  
-  // Add subtle wave effect when hovering
-  float waveX = sin(uv.y * 10.0 + time * 0.5) * 0.005 * hoverIntensity;
-  float waveY = cos(uv.x * 10.0 + time * 0.5) * 0.005 * hoverIntensity;
-  
-  // Combine data texture offset with wave effect
-  vec2 finalOffset = offset.rg + vec2(waveX, waveY);
-  
-  // Apply stronger effect when hovering
-  finalOffset *= (1.0 + hoverIntensity * 0.5);
-  
-  gl_FragColor = texture2D(uTexture, uv - 0.02 * finalOffset);
+  gl_FragColor = texture2D(uTexture, uv - 0.02 * offset.rg);
 }`;
 
 const GridDistortion = ({
@@ -44,26 +32,33 @@ const GridDistortion = ({
   strength = 0.15,
   relaxation = 0.9,
   imageSrc,
-  className = '',
-  hoverStrength = 1.5, // Multiplier for distortion strength on hover
-  animationSpeed = 1.0 // Speed of the hover animation
+  className = ''
 }) => {
   const containerRef = useRef(null);
   const imageAspectRef = useRef(1);
   const cameraRef = useRef(null);
   const initialDataRef = useRef(null);
-  const uniformsRef = useRef(null);
+  // Add a ref to track if we're hovering
   const isHoveringRef = useRef(false);
-  const hoverIntensityRef = useRef(0);
-  const requestAnimationFrameId = useRef(null);
-  
-  // State for animating hover transition
-  const [hoverIntensity, setHoverIntensity] = useState(0);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
+    
+    // Add event listeners for hover state
+    const handleMouseEnter = () => {
+      isHoveringRef.current = true;
+    };
+    
+    const handleMouseLeave = () => {
+      isHoveringRef.current = false;
+    };
+    
+    // Attach event listeners
+    container.addEventListener('mouseenter', handleMouseEnter);
+    container.addEventListener('mouseleave', handleMouseLeave);
+
     const scene = new THREE.Scene();
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -82,9 +77,7 @@ const GridDistortion = ({
       resolution: { value: new THREE.Vector4() },
       uTexture: { value: null },
       uDataTexture: { value: null },
-      hoverIntensity: { value: 0 } // New uniform for hover intensity
     };
-    uniformsRef.current = uniforms;
 
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(imageSrc, (texture) => {
@@ -156,36 +149,19 @@ const GridDistortion = ({
       Object.assign(mouseState, { x, y, prevX: x, prevY: y });
     };
 
-    const handleMouseEnter = () => {
-      isHoveringRef.current = true;
-    };
-
-    const handleMouseLeave = () => {
-      isHoveringRef.current = false;
+    const handleMouseOut = () => {
+      dataTexture.needsUpdate = true;
       Object.assign(mouseState, { x: 0, y: 0, prevX: 0, prevY: 0, vX: 0, vY: 0 });
     };
 
     container.addEventListener('mousemove', handleMouseMove);
-    container.addEventListener('mouseenter', handleMouseEnter);
-    container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('mouseleave', handleMouseOut);
     window.addEventListener('resize', handleResize);
     handleResize();
 
     const animate = () => {
-      requestAnimationFrameId.current = requestAnimationFrame(animate);
-      
-      // Update time uniform
-      uniforms.time.value += 0.05 * animationSpeed;
-
-      // Smooth hover intensity transition
-      if (isHoveringRef.current && hoverIntensityRef.current < 1) {
-        hoverIntensityRef.current = Math.min(hoverIntensityRef.current + 0.05, 1);
-      } else if (!isHoveringRef.current && hoverIntensityRef.current > 0) {
-        hoverIntensityRef.current = Math.max(hoverIntensityRef.current - 0.05, 0);
-      }
-      
-      uniforms.hoverIntensity.value = hoverIntensityRef.current;
-      setHoverIntensity(hoverIntensityRef.current);
+      requestAnimationFrame(animate);
+      uniforms.time.value += 0.05;
 
       const data = dataTexture.image.data;
       for (let i = 0; i < size * size; i++) {
@@ -196,9 +172,9 @@ const GridDistortion = ({
       const gridMouseX = size * mouseState.x;
       const gridMouseY = size * mouseState.y;
       const maxDist = size * mouse;
-      
-      // Apply stronger effects when hovering
-      const currentStrength = strength * (1 + hoverStrength * hoverIntensityRef.current);
+
+      // Apply stronger effects if hovering
+      const effectiveStrength = isHoveringRef.current ? strength * 2.5 : strength;
 
       for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
@@ -207,17 +183,9 @@ const GridDistortion = ({
             const index = 4 * (i + size * j);
             const power = Math.min(maxDist / Math.sqrt(distance), 10);
             
-            // Apply mouse movement effect
-            data[index] += currentStrength * 100 * mouseState.vX * power;
-            data[index + 1] -= currentStrength * 100 * mouseState.vY * power;
-            
-            // Add subtle autonomous movement when hovering
-            if (isHoveringRef.current) {
-              const noiseX = Math.sin(i / 3 + uniforms.time.value * 0.1) * 2;
-              const noiseY = Math.cos(j / 3 + uniforms.time.value * 0.1) * 2;
-              data[index] += noiseX * power * hoverIntensityRef.current;
-              data[index + 1] += noiseY * power * hoverIntensityRef.current;
-            }
+            // Amplify the effect when hovering
+            data[index] += effectiveStrength * 100 * mouseState.vX * power;
+            data[index + 1] -= effectiveStrength * 100 * mouseState.vY * power;
           }
         }
       }
@@ -225,14 +193,11 @@ const GridDistortion = ({
       dataTexture.needsUpdate = true;
       renderer.render(scene, camera);
     };
-    
     animate();
 
     return () => {
-      if (requestAnimationFrameId.current) {
-        cancelAnimationFrame(requestAnimationFrameId.current);
-      }
       container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseleave', handleMouseOut);
       container.removeEventListener('mouseenter', handleMouseEnter);
       container.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('resize', handleResize);
@@ -242,19 +207,15 @@ const GridDistortion = ({
       dataTexture.dispose();
       if (uniforms.uTexture.value) uniforms.uTexture.value.dispose();
     };
-  }, [grid, mouse, strength, relaxation, imageSrc, hoverStrength, animationSpeed]);
+  }, [grid, mouse, strength, relaxation, imageSrc]);
 
   return (
     <div 
       ref={containerRef} 
-      className={`distortion-container ${className}`}
-      style={{ 
-        cursor: 'pointer',
-        transition: 'transform 0.3s ease-out', 
-        transform: hoverIntensity > 0 ? `scale(${1 + hoverIntensity * 0.03})` : 'scale(1)' 
-      }}
+      className={`distortion-container ${className}`} 
+      style={{ cursor: 'pointer' }}
     />
   );
 };
 
-export default GridDistortion;s
+export default GridDistortion;
