@@ -107,3 +107,41 @@ body {
   color: #48bb78; /* Green */
   text-shadow: 0 0 8px rgba(72, 187, 120, 0.8);
 }
+/* Add these to your src/index.css file */
+
+/* Extended transition duration class */
+.transition-opacity-extended {
+  transition-property: opacity;
+  transition-duration: 5000ms; /* 5 seconds transition */
+  transition-timing-function: ease-in-out;
+}
+
+/* Custom animation for pulsing opacity */
+@keyframes slowPulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.animate-opacity-pulse {
+  animation: slowPulse 10s ease-in-out infinite;
+}
+
+/* Animation for slightly moving background */
+@keyframes subtleFloat {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-5px) translateX(5px); }
+  50% { transform: translateY(0) translateX(10px); }
+  75% { transform: translateY(5px) translateX(5px); }
+}
+
+.animate-subtle-float {
+  animation: subtleFloat 30s ease-in-out infinite;
+}
+
+/* Stronger text shadow for better contrast against the distortion */
+.text-shadow-strong {
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.8),
+    0 4px 8px rgba(0, 0, 0, 0.6);
+}

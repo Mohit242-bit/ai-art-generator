@@ -1,55 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ImageGenerator from '../components/features/ImageGenerator';
 import GridDistortion from '../components/animations/GridDistortion';
 
 const Home = () => {
-  const [showDistortion, setShowDistortion] = useState(true);
-  const [fadeOut, setFadeOut] = useState(false);
-  // Simple hover state for basic effects 
-  const [isHovering, setIsHovering] = useState(false);
+  // Instead of conditionally rendering the distortion effect,
+  // we'll keep it permanently mounted and control its intensity
+  const [distortionIntensity, setDistortionIntensity] = useState(0.2); // Start with normal intensity
+  const [distortionOpacity, setDistortionOpacity] = useState(1); // Start fully visible
+  const distortionRef = useRef(null);
+  
+  // For text decryption effect
+  const [decryptedText, setDecryptedText] = useState("");
+  const [decryptIndex, setDecryptIndex] = useState(0);
+  const originalText = "Transform your ideas into stunning AI-generated artwork with just a few words";
+  const encryptedChars = "#$%&@!*^~+=-_?/|{}[]<>";
 
+  // Handle text decryption animation
   useEffect(() => {
-    // After 4 seconds, start fading out
+    if (decryptIndex <= originalText.length) {
+      const decryptTimer = setTimeout(() => {
+        // Generate partly decrypted text
+        let result = "";
+        for (let i = 0; i < originalText.length; i++) {
+          if (i < decryptIndex) {
+            result += originalText[i];
+          } else {
+            result += encryptedChars[Math.floor(Math.random() * encryptedChars.length)];
+          }
+        }
+        setDecryptedText(result);
+        setDecryptIndex(decryptIndex + 1);
+      }, 50); // Speed of decryption
+      
+      return () => clearTimeout(decryptTimer);
+    }
+  }, [decryptIndex]);
+
+  // Control distortion intensity and opacity over time
+  useEffect(() => {
+    // Distortion remains strong for first 30 seconds
+    const reduceIntensity = setTimeout(() => {
+      setDistortionIntensity(0.1); // Reduce intensity after 30 seconds
+    }, 30000);
+    
+    // Start fading opacity after 60 seconds
     const fadeTimer = setTimeout(() => {
-      setFadeOut(true);
-    }, 4000);
-
-    // After 5 seconds, remove the distortion completely
-    const hideTimer = setTimeout(() => {
-      setShowDistortion(false);
-    }, 5000);
-
-    // Clean up timers
+      setDistortionOpacity(0.7); // Reduce opacity but keep slightly visible
+    }, 60000);
+    
+    // Cleanup timers
     return () => {
+      clearTimeout(reduceIntensity);
       clearTimeout(fadeTimer);
-      clearTimeout(hideTimer);
     };
   }, []);
 
   return (
     <div className="relative">
-      {/* Grid Distortion Background - only shown for 5 seconds */}
-      {showDistortion && (
-        <div 
-          className={`fixed inset-0 z-0 transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
-        >
-          <div className={`transition-transform duration-200 ${isHovering ? 'scale-105' : ''}`}>
-            <GridDistortion
-              imageSrc="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
-              grid={15}
-              mouse={0.15}
-              strength={0.2}
-              relaxation={0.85}
-            />
-          </div>
-          <div className="absolute inset-0 bg-black bg-opacity-70"></div>
-        </div>
-      )}
-
-      {/* Static Background - shown after distortion fades */}
-      <div className={`fixed inset-0 z-0 bg-gradient-to-b from-gray-900 to-primary-900 transition-opacity duration-1000 ${showDistortion ? 'opacity-0' : 'opacity-100'}`}>
+      {/* Fixed background that's always present */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-b from-gray-900 to-primary-900">
         <img 
           src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" 
           alt="Background" 
@@ -57,18 +66,34 @@ const Home = () => {
         />
       </div>
 
+      {/* Grid Distortion Effect Layer - always present but with changing intensity */}
+      <div 
+        className="fixed inset-0 z-10 transition-opacity duration-5000"
+        style={{ opacity: distortionOpacity }}
+        ref={distortionRef}
+      >
+        <GridDistortion
+          imageSrc="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
+          grid={15}
+          mouse={0.15}
+          strength={distortionIntensity} // Dynamically control the strength
+          relaxation={0.85}
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-70"></div>
+      </div>
+
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4">
+      <div className="relative z-20 max-w-6xl mx-auto px-4">
         {/* Hero Section */}
         <section className="min-h-[85vh] flex flex-col justify-center items-center text-center mb-16">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white text-shadow">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white text-shadow animate-pulse-slow">
             AI Art Generator
           </h1>
-          <p className="text-xl md:text-2xl max-w-2xl mb-10 text-white text-shadow">
-            Transform your ideas into stunning AI-generated artwork with just a few words
+          <p className="text-xl md:text-2xl max-w-2xl mb-10 text-white text-shadow font-mono">
+            {decryptedText || originalText}
           </p>
           
-          <a href="#generator" className="bg-white text-primary-800 hover:bg-primary-100 px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-300 shadow-lg">
+          <a href="#generator" className="bg-white text-primary-800 hover:bg-primary-100 px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-300 shadow-lg animate-float">
             Start Creating
           </a>
         </section>
