@@ -1,19 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ImageGenerator from '../components/features/ImageGenerator';
-import GridDistortion from '../components/animations/GridDistortion';
+import Hyperspeed from '../components/animations/Hyperspeed';
+import customBackground from '../assets/your-image.jpg';
 
 const Home = () => {
-  // Instead of conditionally rendering the distortion effect,
-  // we'll keep it permanently mounted and control its intensity
-  const [distortionIntensity, setDistortionIntensity] = useState(0.2); // Start with normal intensity
-  const [distortionOpacity, setDistortionOpacity] = useState(1); // Start fully visible
-  const distortionRef = useRef(null);
-  
   // For text decryption effect
   const [decryptedText, setDecryptedText] = useState("");
   const [decryptIndex, setDecryptIndex] = useState(0);
   const originalText = "Transform your ideas into stunning AI-generated artwork with just a few words";
   const encryptedChars = "#$%&@!*^~+=-_?/|{}[]<>";
+  
+  // Define custom hyperspeed options
+  const hyperspeedOptions = {
+    colors: {
+      roadColor: 0x080808,
+      islandColor: 0x0a0a0a,
+      background: 0x000000,
+      shoulderLines: 0xFFFFFF,
+      brokenLines: 0xFFFFFF,
+      leftCars: [0xD856BF, 0x6750A2, 0xC247AC],
+      rightCars: [0x03B3C3, 0x0E5EA5, 0x324555],
+      sticks: 0x03B3C3,
+    },
+    onSpeedUp: () => console.log('Speed up'),
+    onSlowDown: () => console.log('Slow down'),
+    fov: 90,
+    speedUp: 2
+  };
 
   // Handle text decryption animation
   useEffect(() => {
@@ -30,58 +43,22 @@ const Home = () => {
         }
         setDecryptedText(result);
         setDecryptIndex(decryptIndex + 1);
-      }, 50); // Speed of decryption
+      }, 10); // Speed of decryption
       
       return () => clearTimeout(decryptTimer);
     }
   }, [decryptIndex]);
 
-  // Control distortion intensity and opacity over time
-  useEffect(() => {
-    // Distortion remains strong for first 30 seconds
-    const reduceIntensity = setTimeout(() => {
-      setDistortionIntensity(0.1); // Reduce intensity after 30 seconds
-    }, 30000);
-    
-    // Start fading opacity after 60 seconds
-    const fadeTimer = setTimeout(() => {
-      setDistortionOpacity(0.7); // Reduce opacity but keep slightly visible
-    }, 60000);
-    
-    // Cleanup timers
-    return () => {
-      clearTimeout(reduceIntensity);
-      clearTimeout(fadeTimer);
-    };
-  }, []);
-
   return (
     <div className="relative">
-      {/* Fixed background that's always present */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-b from-gray-900 to-primary-900">
-        <img 
-          src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" 
-          alt="Background" 
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
+      {/* Hyperspeed background effect */}
+      <div className="fixed inset-0 z-0">
+        <Hyperspeed effectOptions={hyperspeedOptions} />
       </div>
-
-      {/* Grid Distortion Effect Layer - always present but with changing intensity */}
-      <div 
-        className="fixed inset-0 z-10 transition-opacity duration-5000"
-        style={{ opacity: distortionOpacity }}
-        ref={distortionRef}
-      >
-        <GridDistortion
-          imageSrc="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
-          grid={15}
-          mouse={0.15}
-          strength={distortionIntensity} // Dynamically control the strength
-          relaxation={0.85}
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-70"></div>
-      </div>
-
+      
+      {/* Semi-transparent overlay to ensure content readability */}
+      <div className="fixed inset-0 z-5 bg-black bg-opacity-40"></div>
+      
       {/* Content */}
       <div className="relative z-20 max-w-6xl mx-auto px-4">
         {/* Hero Section */}
