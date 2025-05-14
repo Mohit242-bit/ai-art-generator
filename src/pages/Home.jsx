@@ -41,7 +41,23 @@ const Home = () => {
           className={`fixed inset-0 z-10 transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-70'}`}
           style={{ pointerEvents: 'none' }}
         >
-          <Hyperspeed />
+          <Hyperspeed 
+            effectOptions={{
+              distortion: 'turbulentDistortion',
+              onSpeedUp: () => console.log('Speed up!'),
+              onSlowDown: () => console.log('Slow down!'),
+              colors: {
+                roadColor: 0x080808,
+                islandColor: 0x0a0a0a,
+                background: 0x000000,
+                shoulderLines: 0xFFFFFF,
+                brokenLines: 0xFFFFFF,
+                leftCars: [0xD856BF, 0x6750A2, 0xC247AC],
+                rightCars: [0x03B3C3, 0x0E5EA5, 0x324555],
+                sticks: 0x03B3C3,
+              }
+            }}
+          />
         </div>
       )}
 
