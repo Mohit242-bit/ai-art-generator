@@ -5,17 +5,20 @@ import Distortion from '../components/animations/Distortion';
 const Home = () => {
   const [showDistortion, setShowDistortion] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  
+  // Sample background image for distortion effect
+  const backgroundImage = "/image.jpg";
 
   useEffect(() => {
-    // After 4 seconds, start fading out
+    // After 10 seconds, start fading out (increased from 4s)
     const fadeTimer = setTimeout(() => {
       setFadeOut(true);
-    }, 4000);
+    }, 10000);
 
-    // After 5 seconds, remove the distortion completely
+    // After 15 seconds, remove the distortion completely (increased from 5s)
     const hideTimer = setTimeout(() => {
       setShowDistortion(false);
-    }, 5000);
+    }, 15000);
 
     // Clean up timers
     return () => {
@@ -29,34 +32,24 @@ const Home = () => {
       {/* Static Background - always visible */}
       <div className="fixed inset-0 z-0 bg-gradient-to-b from-gray-900 to-primary-900">
         <img 
-          src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80" 
+          src={backgroundImage}
           alt="Background" 
           className="absolute inset-0 w-full h-full object-cover opacity-20"
         />
       </div>
 
-      {/* Hyperspeed Animation - layered on top with transparency */}
+      {/* Distortion Animation - layered on top with transparency */}
       {showDistortion && (
         <div 
-          className={`fixed inset-0 z-10 transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-70'}`}
-          style={{ pointerEvents: 'none' }}
+          className={`fixed inset-0 z-10 transition-opacity duration-5000 ${fadeOut ? 'opacity-0' : 'opacity-70'}`}
+          style={{ pointerEvents: 'none', transitionDuration: '5s' }}
         >
-          <Hyperspeed 
-            effectOptions={{
-              distortion: 'turbulentDistortion',
-              onSpeedUp: () => console.log('Speed up!'),
-              onSlowDown: () => console.log('Slow down!'),
-              colors: {
-                roadColor: 0x080808,
-                islandColor: 0x0a0a0a,
-                background: 0x000000,
-                shoulderLines: 0xFFFFFF,
-                brokenLines: 0xFFFFFF,
-                leftCars: [0xD856BF, 0x6750A2, 0xC247AC],
-                rightCars: [0x03B3C3, 0x0E5EA5, 0x324555],
-                sticks: 0x03B3C3,
-              }
-            }}
+          <Distortion 
+            imageSrc={backgroundImage}
+            grid={20}         // Increased from 15 for more detailed distortion
+            mouse={0.15}      // Increased from 0.1 for wider effect
+            strength={0.2}    // Increased from 0.15 for stronger effect
+            relaxation={0.92} // Changed from 0.9 - higher values make it last longer
           />
         </div>
       )}

@@ -25,7 +25,7 @@ void main() {
   gl_FragColor = texture2D(uTexture, uv - 0.02 * offset.rg);
 }`;
 
-const GridDistortion = ({
+const Distortion = ({
   grid = 15,
   mouse = 0.1,
   strength = 0.15,
@@ -188,4 +188,4 @@ const GridDistortion = ({
   return <div ref={containerRef} className={`distortion-container ${className}`} />;
 };
 
-export default GridDistortion;
+export default Distortion;
