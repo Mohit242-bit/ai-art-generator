@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ImageGenerator from '../components/features/ImageGenerator';
-import Hyperspeed from '../components/animations/Hyperspeed';
+import Distortion from '../components/animations/Distortion';
 
 const Home = () => {
   const [showDistortion, setShowDistortion] = useState(true);
