@@ -50,8 +50,21 @@
 
 /* Global styles */
 body {
-  @apply bg-gray-50 text-gray-900 min-h-screen;
+  /* Remove conflicting tailwind bg class and use direct style */
+  background-color: #000000 !important; /* Added !important to override any Tailwind classes */
+  color: #ffffff; /* Ensure text is white for visibility on black background */
+  min-height: 100vh;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Make sure white card backgrounds are preserved */
+.bg-white {
+  background-color: #ffffff;
+}
+
+/* Ensure opacity for semi-transparent cards */
+.bg-opacity-95 {
+  --tw-bg-opacity: 0.95;
 }
 
 /* Text shadow for better readability on background images */
@@ -107,7 +120,6 @@ body {
   color: #48bb78; /* Green */
   text-shadow: 0 0 8px rgba(72, 187, 120, 0.8);
 }
-/* Add these to your src/index.css file */
 
 /* Extended transition duration class */
 .transition-opacity-extended {

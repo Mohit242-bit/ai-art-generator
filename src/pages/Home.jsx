@@ -1,33 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import ImageGenerator from '../components/features/ImageGenerator';
-
 import TrueFocus from '../components/animations/TrueFocus';
+import SplashCursor from '../components/animations/SplashCursor';
 
 const Home = () => {
-  const [showDistortion, setShowDistortion] = useState(true);
-  const [fadeOut, setFadeOut] = useState(false);
   const [showTitleFocus, setShowTitleFocus] = useState(false);
   
-  // Sample background image for distortion effect
-  const backgroundImage = "/image.jpg";
+
 
   useEffect(() => {
-    // After 10 seconds, start fading out (increased from 4s)
-    const fadeTimer = setTimeout(() => {
-      setFadeOut(true);
-    }, 3000);
-
-    // After 15 seconds, remove the distortion completely (increased from 5s)
-    const hideTimer = setTimeout(() => {
-      setShowDistortion(false);
-      // Start the TrueFocus animation after distortion is gone
+    // Show the TrueFocus animation after a short delay
+    const showTimer = setTimeout(() => {
       setShowTitleFocus(true);
-    }, 4000);
+    }, 2000);
 
-    // Clean up timers
+    // Clean up timer
     return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(hideTimer);
+      clearTimeout(showTimer);
     };
   }, []);
 
@@ -42,21 +31,22 @@ const Home = () => {
         />
       </div>
 
-      {/* Distortion Animation - layered on top with transparency */}
-      {showDistortion && (
-        <div 
-          className={`fixed inset-0 z-10 transition-opacity duration-5000 ${fadeOut ? 'opacity-0' : 'opacity-70'}`}
-          style={{ pointerEvents: 'none', transitionDuration: '5s' }}
-        >
-          <Distortion 
-            imageSrc={backgroundImage}
-            grid={20}         // Increased from 15 for more detailed distortion
-            mouse={0.15}      // Increased from 0.1 for wider effect
-            strength={0.2}    // Increased from 0.15 for stronger effect
-            relaxation={0.92} // Changed from 0.9 - higher values make it last longer
-          />
-        </div>
-      )}
+      {/* SplashCursor Animation - layered on top */}
+      <SplashCursor 
+        SIM_RESOLUTION={128}
+        DYE_RESOLUTION={1440}
+        DENSITY_DISSIPATION={3.5}
+        VELOCITY_DISSIPATION={1}
+        PRESSURE={0.1}
+        PRESSURE_ITERATIONS={20}
+        CURL={3}
+        SPLAT_RADIUS={0.2}
+        SPLAT_FORCE={4000}
+        SHADING={true}
+        COLOR_UPDATE_SPEED={10}
+        BACK_COLOR={{ r: 0.5, g: 0, b: 0 }}
+        TRANSPARENT={true}
+      />
 
       {/* Content */}
       <div className="relative z-20 max-w-6xl mx-auto px-4">
