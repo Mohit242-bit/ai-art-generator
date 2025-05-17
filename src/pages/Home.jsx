@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ImageGenerator from '../components/features/ImageGenerator';
-import Distortion from '../components/animations/Distortion';
+
+import TrueFocus from '../components/animations/TrueFocus';
 
 const Home = () => {
   const [showDistortion, setShowDistortion] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  const [showTitleFocus, setShowTitleFocus] = useState(false);
   
   // Sample background image for distortion effect
   const backgroundImage = "/image.jpg";
@@ -13,12 +15,14 @@ const Home = () => {
     // After 10 seconds, start fading out (increased from 4s)
     const fadeTimer = setTimeout(() => {
       setFadeOut(true);
-    }, 10000);
+    }, 3000);
 
     // After 15 seconds, remove the distortion completely (increased from 5s)
     const hideTimer = setTimeout(() => {
       setShowDistortion(false);
-    }, 15000);
+      // Start the TrueFocus animation after distortion is gone
+      setShowTitleFocus(true);
+    }, 4000);
 
     // Clean up timers
     return () => {
@@ -58,9 +62,26 @@ const Home = () => {
       <div className="relative z-20 max-w-6xl mx-auto px-4">
         {/* Hero Section */}
         <section className="min-h-[85vh] flex flex-col justify-center items-center text-center mb-16">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white text-shadow">
-            AI Art Generator
-          </h1>
+          {!showTitleFocus ? (
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white text-shadow">
+              AI Art Generator
+            </h1>
+          ) : (
+            <div className="mb-6">
+              <TrueFocus 
+                sentence="AI Art Generator"
+                blurAmount={4}
+                borderColor="#0284c7" // primary-600 from your tailwind config
+                glowColor="rgba(2, 132, 199, 0.6)" // primary-600 with opacity
+                animationDuration={0.8}
+                pauseBetweenAnimations={2}
+                fontSize="5xl md:text-7xl"
+                fontWeight="bold"
+                startAnimation={showTitleFocus}
+                className="text-white text-shadow"
+              />
+            </div>
+          )}
           <p className="text-xl md:text-2xl max-w-2xl mb-10 text-white text-shadow">
             Transform your ideas into stunning AI-generated artwork with just a few words
           </p>
