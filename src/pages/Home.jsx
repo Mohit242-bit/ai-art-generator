@@ -4,31 +4,14 @@ import TrueFocus from '../components/animations/TrueFocus';
 import SplashCursor from '../components/animations/SplashCursor';
 
 const Home = () => {
-  const [showTitleFocus, setShowTitleFocus] = useState(false);
-  
-
-
-  useEffect(() => {
-    // Show the TrueFocus animation after a short delay
-    const showTimer = setTimeout(() => {
-      setShowTitleFocus(true);
-    }, 2000);
-
-    // Clean up timer
-    return () => {
-      clearTimeout(showTimer);
-    };
-  }, []);
+  // No need for showTitleFocus state anymore
+  // No need for the useEffect to toggle the state now
 
   return (
     <div className="relative">
       {/* Static Background - always visible */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-b from-gray-900 to-primary-900">
-        <img 
-          src={backgroundImage}
-          alt="Background" 
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
+      <div className="fixed inset-0 z-0 bg-black">
+        {/* Simple black background */}
       </div>
 
       {/* SplashCursor Animation - layered on top */}
@@ -52,26 +35,19 @@ const Home = () => {
       <div className="relative z-20 max-w-6xl mx-auto px-4">
         {/* Hero Section */}
         <section className="min-h-[85vh] flex flex-col justify-center items-center text-center mb-16">
-          {!showTitleFocus ? (
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white text-shadow">
-              AI Art Generator
-            </h1>
-          ) : (
-            <div className="mb-6">
-              <TrueFocus 
-                sentence="AI Art Generator"
-                blurAmount={4}
-                borderColor="#0284c7" // primary-600 from your tailwind config
-                glowColor="rgba(2, 132, 199, 0.6)" // primary-600 with opacity
-                animationDuration={0.8}
-                pauseBetweenAnimations={2}
-                fontSize="5xl md:text-7xl"
-                fontWeight="bold"
-                startAnimation={showTitleFocus}
-                className="text-white text-shadow"
-              />
-            </div>
-          )}
+          <h1 className="mb-6 text-4xl md:text-5xl">
+            <TrueFocus 
+              sentence="AI Art Generator"
+              blurAmount={4}
+              borderColor="#0284c7"
+              glowColor="rgba(2, 132, 199, 0.6)"
+              animationDuration={0.8}
+              pauseBetweenAnimations={2}
+              fontWeight="bold"
+              startAnimation={true}
+              className="text-white text-shadow"
+            />
+          </h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-10 text-white text-shadow">
             Transform your ideas into stunning AI-generated artwork with just a few words
           </p>
